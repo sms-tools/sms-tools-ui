@@ -1,28 +1,27 @@
 <script setup lang="ts">
-import { ref, onMounted, inject } from 'vue'
-import axios from 'axios'
+import request from '@/stores/requestManager';
+import { ref, onMounted } from 'vue';
 
-const loading = ref(true)
-const data = ref(null)
-const apiLink = inject('apiLink') as string
+const loading = ref(true);
+const data = ref<{ total: string } | null>(null);
 
 onMounted(async () => {
-  try {
-    const response = await axios.get(apiLink)
-    data.value = response.data
-  } catch (error) {
-    console.error('Error fetching data:', error)
-  } finally {
-    loading.value = false
+  const fetchProgress = await request('getProgress');
+  if (!fetchProgress) {
+    data.value = { total: 'erreur au chargement' };
+  } else {
+    loading.value = false;
+    console.log(fetchProgress);
+    data.value = { total: fetchProgress.body.data.total };
   }
-})
+});
 </script>
 
 <template>
   <header></header>
   <main>
-    votre consomation mensuel:
+    votre consomation total:
     <div v-if="loading">Loading...</div>
-    <div v-else>{{ data }}</div>
+    <div v-else>{{ data?.total }} client</div>
   </main>
 </template>
