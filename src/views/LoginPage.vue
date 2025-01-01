@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, inject } from 'vue';
+import { ref } from 'vue';
 
-const apiLink = inject('apiLink') as string | undefined;
+const apiLink = localStorage.getItem('apiLink');
 const phone = ref('');
 const password = ref('');
 const successMessage = ref<string | undefined>(undefined);

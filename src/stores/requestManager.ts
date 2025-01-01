@@ -1,5 +1,4 @@
 import router from '@/router';
-import { inject } from 'vue';
 
 async function request(
   pages: string,
@@ -7,7 +6,7 @@ async function request(
   body = {},
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<{ status: number; body: Record<string, any> } | void> {
-  const apiLink = inject('apiLink') as string;
+  const apiLink = localStorage.getItem('apiLink');
   const token = localStorage.getItem('authToken');
 
   if (token == null || !token) return newLogin();

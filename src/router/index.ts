@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import LoginPage from '../views/LoginPage.vue';
 import HomePage from '../views/HomePage.vue';
+import SmsPage from '@/views/SmsPage.vue';
 
 const routes = [
   { path: '/login', name: 'Login', component: LoginPage },
   { path: '/', name: 'Home', component: HomePage, meta: { requiresAuth: true } },
+  { path: '/sms', name: 'sms', component: SmsPage, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
