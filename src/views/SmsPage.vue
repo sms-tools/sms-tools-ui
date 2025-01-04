@@ -3,6 +3,8 @@ import request from '@/stores/requestManager';
 import { ref } from 'vue';
 
 const phone = ref('');
+const sendMessage = ref('');
+const sendStatus = ref<undefined | 'send' | 'errored'>(undefined);
 const data = ref<Array<Message>>([]);
 let sseReader: ReadableStreamDefaultReader<Uint8Array> | null = null;
 
@@ -80,21 +82,41 @@ async function search() {
     sseReader = null;
   }
 }
+
+async function send() {
+  try {
+    const sendResult = (await request('sendSms', 'post', {
+      phone: phone.value,
+      message: sendMessage.value,
+    })) as { body: { data: Message }; status: 500 | 200 | number } | void;
+    if (!sendResult || sendResult.status != 200) {
+      sendStatus.value = 'errored';
+      return;
+    }
+
+    sendMessage.value = '';
+    sendStatus.value = 'send';
+    console.log(sendResult.body.data);
+    data.value.push(sendResult.body.data);
+  } catch (error) {
+    console.error(error);
+    sendStatus.value = 'send';
+    return;
+  }
+}
 </script>
 <template>
   <div class="sms-page">
     <form @submit.prevent="search">
-      <div>
-        <label for="phone">Numéro de téléphone</label>
-        <input
-          id="phone"
-          v-model="phone"
-          type="tel"
-          required
-          pattern="[0-9]{10}"
-          placeholder="Entrez un numéro de téléphone"
-        />
-      </div>
+      <label for="phone">Numéro de téléphone</label>
+      <input
+        id="phone"
+        v-model="phone"
+        type="tel"
+        required
+        pattern="[0-9]{10}"
+        placeholder="Entrez un numéro de téléphone"
+      />
       <button type="submit">Rechercher</button>
     </form>
 
@@ -104,80 +126,17 @@ async function search() {
         <small>{{ new Date(message.date).toLocaleString() }}</small>
       </li>
     </ul>
+
+    <form v-if="data.length != 0" @submit.prevent="send" class="sending">
+      <input
+        type="text"
+        name="sendingText"
+        id="sendingText"
+        placeholder="votre message"
+        required
+        v-model="sendMessage"
+      />
+      <button type="submit">envoyer</button>
+    </form>
   </div>
 </template>
-
-<!-- <script setup lang="ts">
-import request from '@/stores/requestManager';
-import { ref } from 'vue';
-
-const phone = ref('');
-const data = ref<Array<message>>([]);
-async function search() {
-  if (!phone.value) {
-    return;
-  }
-  const fetchMessage = (await request('getMessage', 'post', {
-    phoneNumber: phone.value,
-  })) as void | { body: { data: Array<message> } };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  console.log((fetchMessage as any).body.data);
-  if (
-    !fetchMessage ||
-    !Array.isArray(fetchMessage.body.data) ||
-    typeof fetchMessage == 'function'
-  ) {
-    console.log(
-      !fetchMessage,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      !Array.isArray((fetchMessage as any).body.data),
-      typeof fetchMessage == 'function',
-    );
-    data.value = [];
-  } else {
-    data.value = fetchMessage.body.data;
-  }
-
-  // Implementation of SSE to update data with new messages
-  const response = await fetch(localStorage.getItem('apiLink') + 'getNewMessage', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: `Bearer ${localStorage.getItem('authToken')}`,
-    },
-    body: JSON.stringify({ phoneNumber: phone.value }),
-  });
-  const reader = response?.body?.getReader();
-  const decoder = new TextDecoder('utf-8');
-  if (!reader) {
-    console.log('error, sse not connected');
-    return;
-  }
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    const decodedValue = decoder.decode(value);
-    console.log('Received', decodedValue);
-    try {
-      const newMessage = JSON.parse(decodedValue);
-      data.value.push(newMessage);
-    } catch (error) {
-      console.error('Error parsing SSE message', error);
-    }
-  }
-}
-</script>
-
-<template>
-  <div class="sms-page">
-    <form @submit.prevent="search">
-      <div>
-        <label for="username">numero de telephone</label>
-        <input id="username" v-model="phone" type="tel" required pattern="[0-9]{10}" />
-      </div>
-      <button type="submit">rechercher</button>
-    </form>
-    <li v-for="message in data" :key="message._id" class="messageBox">{{ message }}</li>
-  </div>
-</template> -->
