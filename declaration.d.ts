@@ -10,3 +10,9 @@ type Message = {
   deliveredAt: Date | undefined;
   sendAt: Date | undefined;
 };
+
+type contact = {
+  createDate: Date;
+  phoneNumber: String;
+  contactName: String;
+};

@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import request from '@/stores/requestManager';
 import { ref } from 'vue';
+import { useRoute } from 'vue-router';
 
-const phone = ref('');
+const route = useRoute();
+const phone = ref(route.query.phone || '');
 const sendMessage = ref('');
 const sendStatus = ref<undefined | 'send' | 'errored'>(undefined);
-const data = ref<Array<Message>>([]);
+const data = ref<Array<Message> | undefined>();
+const popUpVisible = ref(false);
 let sseReader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+if (phone.value != '') search();
 
 async function search() {
   if (!phone.value) {
@@ -18,17 +22,22 @@ async function search() {
   try {
     const fetchMessage = (await request('getMessage', 'post', {
       phoneNumber: phone.value,
-    })) as { body: { data: Array<Message> } } | void;
+    })) as { body: { data: Array<Message> }; status: number } | void;
 
-    if (!fetchMessage || !Array.isArray(fetchMessage.body.data)) {
+    if (fetchMessage && fetchMessage.status == 404) {
+      popUpVisible.value = true;
+      data.value = undefined;
+      return;
+    }
+    if (!fetchMessage || !Array.isArray(fetchMessage.body.data) || fetchMessage.status != 200) {
       console.error('Failed to fetch messages');
-      data.value = [];
+      data.value = undefined;
       return;
     }
     data.value = fetchMessage.body.data;
   } catch (error) {
     console.error('Error fetching messages:', error);
-    data.value = [];
+    data.value = undefined;
     return;
   }
 
@@ -57,8 +66,6 @@ async function search() {
     const reader = response.body.getReader();
     sseReader = reader;
     const decoder = new TextDecoder('utf-8');
-
-    console.log('SSE connected.');
 
     while (true) {
       const { value, done } = await reader.read();
@@ -97,7 +104,11 @@ async function send() {
     sendMessage.value = '';
     sendStatus.value = 'send';
     console.log(sendResult.body.data);
-    data.value.push(sendResult.body.data);
+    if (data.value) {
+      data.value.push(sendResult.body.data);
+    } else {
+      data.value = [sendResult.body.data];
+    }
   } catch (error) {
     console.error(error);
     sendStatus.value = 'send';
@@ -119,7 +130,10 @@ async function send() {
       />
       <button type="submit">Rechercher</button>
     </form>
-
+    <div v-if="popUpVisible">
+      cet utilisateur semble inconnus...
+      <a :href="`/createContact?phone=${phone}`">cliquez ici pour le créer</a>
+    </div>
     <ul>
       <li v-for="message in data" :key="message._id" class="messageBox">
         <strong>{{ message.contactID }}</strong> : {{ message.message }}
@@ -127,7 +141,7 @@ async function send() {
       </li>
     </ul>
 
-    <form v-if="data.length != 0" @submit.prevent="send" class="sending">
+    <form v-if="Array.isArray(data)" @submit.prevent="send" class="sending">
       <input
         type="text"
         name="sendingText"

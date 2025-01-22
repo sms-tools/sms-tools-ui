@@ -1,5 +1,13 @@
 import router from '@/router';
 
+/**
+ * Makes an HTTP request to the specified API endpoint.
+ *
+ * @param pages - The API endpoint to which the request is made.
+ * @param method - The HTTP method to use for the request (default is 'get').
+ * @param body - The request payload to send with the request (default is an empty object).
+ * @returns A promise that resolves to an object containing the response status and body, or void if the request fails.
+ */
 async function request(
   pages: string,
   method: RequestInit['method'] = 'get',
