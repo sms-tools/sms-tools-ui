@@ -135,7 +135,13 @@ async function send() {
         cet utilisateur semble inconnus...
         <a :href="`/createContact?phone=${phone}`">cliquez ici pour le créer</a>
       </div>
-      <ContactList />
+      <ContactList
+        :changeContact="
+          (id) => {
+            console.log(id);
+          }
+        "
+      />
     </section>
     <!-- message -->
     <section class="smsElement">
