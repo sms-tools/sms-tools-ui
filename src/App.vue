@@ -1,25 +1,22 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import { RouterView } from 'vue-router';
 </script>
 
 <template>
   <div>
     <header>
       <img src="../src/assets/logo.svg" />
-      <RouterLink class="link" to="/sms">Sms</RouterLink>
+      <RouterLink class="link" to="/sms"><img src="../src/assets/smsNetral.svg" /></RouterLink>
       <RouterLink class="link" to="/contact">Contact</RouterLink>
       <div>Contact</div>
     </header>
-    <RouterView />
+    <RouterView class="router" />
   </div>
 </template>
 
 <style scoped>
 div {
   display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100vw;
 }
 
 header {
@@ -27,7 +24,7 @@ header {
   max-height: 5vh;
   display: flex;
   align-items: center;
-  flex-direction: row;
+  flex-direction: column;
   gap: 2vw;
 }
 
@@ -37,6 +34,13 @@ header {
 }
 
 img {
-  max-height: 100%;
+  max-height: 2vw;
+  margin: 0.2vw;
+}
+
+.router {
+  background-color: var(--white);
+  height: 100vh;
+  width: 97.8vw;
 }
 </style>

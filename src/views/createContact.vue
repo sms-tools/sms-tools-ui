@@ -20,7 +20,7 @@ async function submit() {
   }
 
   const contactCreated = await request('/createContact', 'post', {
-    ContactName: ContactName.value,
+    contactName: ContactName.value,
     phoneNumber: phoneNumber.value,
   });
   if (!contactCreated) {

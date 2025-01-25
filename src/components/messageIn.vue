@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-const message = ref<message>();
+const message = ref<Message>();
 </script>
 
 <template>
