@@ -11,7 +11,6 @@ onMounted(async () => {
     data.value = { total: 'erreur au chargement' };
   } else {
     loading.value = false;
-    console.log(fetchProgress);
     data.value = { total: fetchProgress.body.data.total };
   }
 });

@@ -1,92 +1,32 @@
 <script setup lang="ts">
 import ContactList from '@/components/ContactList.vue';
+import SmsList from '@/components/smsList.vue';
 import request from '@/stores/requestManager';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 
+/*
+on loading charge phone on query
+if you clik on contact identifier change.
+if you enter phone, identifier = phone
+if you send new message SmsList and ContactList update our list
+*/
+
 const route = useRoute();
-const phone = ref(route.query.phone || '');
+//for user update
+const phone = ref((route.query.phone || '') as string);
+const identifier = ref<string>(phone.value);
+
 const sendMessage = ref('');
+const lastMessage = ref<Message | undefined>();
 const sendStatus = ref<undefined | 'send' | 'errored'>(undefined);
-const data = ref<Array<Message> | undefined>();
 const popUpVisible = ref(false);
-let sseReader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+
+//if phone is in request
 if (phone.value != '') search();
 
 async function search() {
-  // reset sse
-  if (sseReader) {
-    sseReader.cancel();
-    sseReader = null;
-  }
-
-  if (!phone.value) {
-    console.log('Phone number is required.');
-    return;
-  }
-
-  // fetch existant message
-  try {
-    const fetchMessage = (await request('getMessage', 'post', {
-      phoneNumber: phone.value,
-    })) as { body: { data: Array<Message> }; status: number } | void;
-
-    if (fetchMessage && fetchMessage.status == 404) {
-      popUpVisible.value = true;
-      data.value = undefined;
-      return;
-    }
-    if (!fetchMessage || !Array.isArray(fetchMessage.body.data) || fetchMessage.status != 200) {
-      console.error('Failed to fetch messages');
-      data.value = undefined;
-      return;
-    }
-    data.value = fetchMessage.body.data;
-  } catch (error) {
-    console.error('Error fetching messages:', error);
-    data.value = undefined;
-    return;
-  }
-
-  // connect to sse for find new message
-  try {
-    const response = await fetch(`${localStorage.getItem('apiLink')}getNewMessage`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-      },
-      body: JSON.stringify({ phoneNumber: phone.value }),
-    });
-
-    if (!response.ok || !response.body) {
-      console.error('Failed to establish SSE connection.');
-      return;
-    }
-
-    const reader = response.body.getReader();
-    sseReader = reader;
-    const decoder = new TextDecoder('utf-8');
-
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-
-      const decodedValue = decoder.decode(value);
-
-      try {
-        const newMessage = JSON.parse(decodedValue) as Message;
-        data.value.push(newMessage);
-      } catch (error) {
-        console.error('Error parsing SSE message:', error);
-      }
-    }
-  } catch (error) {
-    console.error('Error during SSE connection:', error);
-  } finally {
-    console.log('SSE connection closed.');
-    sseReader = null;
-  }
+  identifier.value = phone.value;
 }
 
 async function send() {
@@ -102,12 +42,7 @@ async function send() {
 
     sendMessage.value = '';
     sendStatus.value = 'send';
-    if (data.value) {
-      const message = sendResult.body.data.message;
-      data.value.push(message);
-    } else {
-      data.value = [sendResult.body.data.message];
-    }
+    lastMessage.value = sendResult.body.data.message;
   } catch (error) {
     console.error(error);
     sendStatus.value = 'send';
@@ -115,6 +50,7 @@ async function send() {
   }
 }
 </script>
+
 <template>
   <div class="sms-page">
     <!-- search -->
@@ -131,6 +67,7 @@ async function send() {
         />
         <button type="submit">Rechercher</button>
       </form>
+      <!-- if not fond -->
       <div v-if="popUpVisible">
         cet utilisateur semble inconnus...
         <a :href="`/createContact?phone=${phone}`">cliquez ici pour le créer</a>
@@ -138,29 +75,24 @@ async function send() {
       <ContactList
         :changeContact="
           (id) => {
-            console.log(id);
+            identifier = id;
           }
         "
+        :lastMessage="lastMessage"
       />
     </section>
     <!-- message -->
     <section class="smsElement">
-      <ul>
-        <li
-          v-for="message in data"
-          :key="message._id"
-          :class="['messageBox', { sended: !message.direction, receved: message.direction }]"
-        >
-          <div class="messageText">
-            {{ message.message }}
-          </div>
-          <div class="messageDate">
-            {{ new Date(message.date).toLocaleString() }}
-          </div>
-        </li>
-      </ul>
-
-      <form v-if="Array.isArray(data)" @submit.prevent="send" class="sending">
+      <SmsList
+        :identifier="identifier"
+        :lastMessage="lastMessage"
+        :sseDos="
+          (message: Message) => {
+            lastMessage = message;
+          }
+        "
+      />
+      <form v-if="identifier" @submit.prevent="send" class="sending">
         <input
           type="text"
           name="sendingText"
@@ -186,12 +118,12 @@ section {
 }
 
 section.searchPart {
-  width: 40vw;
+  width: 36.5vw;
   height: 96vh;
 }
 
 section.smsElement {
-  width: 60vw;
+  width: 56.5vw;
   height: 96vh;
   border-radius: var(--radius);
   background-color: white;
@@ -199,7 +131,7 @@ section.smsElement {
 }
 
 form.sending {
-  padding: 1vh 0px;
+  padding: 2vh 0px;
 }
 
 input#sendingText {
@@ -219,43 +151,5 @@ button#sendButton {
   color: white;
   height: 4vh;
   border-radius: var(--radius);
-}
-
-.smsElement ul {
-  gap: 10px;
-  height: 86vh;
-  margin: none;
-  display: flex;
-  overflow: scroll;
-  list-style: none;
-  padding: 1vh;
-  border-radius: var(--radius);
-  flex-direction: column;
-  background-color: var(--white);
-}
-
-.messageBox {
-  padding: 10px;
-  min-width: 2vw;
-  max-width: 20vw;
-}
-
-.messageBox.sended {
-  color: white;
-  align-self: flex-end;
-  background-color: var(--blue);
-  border-radius: var(--radius) 0px 10px var(--radius);
-}
-
-.messageBox.receved {
-  color: black;
-  background-color: white;
-  border-radius: 0px var(--radius) var(--radius) var(--radius);
-}
-
-.messageDate {
-  font-size: 0.8em;
-  color: grey;
-  text-align: right;
 }
 </style>
