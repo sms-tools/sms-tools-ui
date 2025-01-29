@@ -9,6 +9,7 @@ const props = defineProps({
   },
   lastMessage: {
     type: Object as PropType<Message | undefined>,
+    required: false,
   },
 });
 watch(

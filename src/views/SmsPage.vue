@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ContactList from '@/components/ContactList.vue';
-import SmsList from '@/components/smsList.vue';
+import SmsList from '@/components/SmsList.vue';
 import request from '@/stores/requestManager';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -15,10 +15,10 @@ if you send new message SmsList and ContactList update our list
 const route = useRoute();
 //for user update
 const phone = ref((route.query.phone || '') as string);
-const identifier = ref<string>(phone.value);
+const identifier = ref<string>(phone.value || '');
 
 const sendMessage = ref('');
-const lastMessage = ref<Message | undefined>();
+const lastMessage = ref<Message | undefined>(undefined);
 const sendStatus = ref<undefined | 'send' | 'errored'>(undefined);
 const popUpVisible = ref(false);
 
