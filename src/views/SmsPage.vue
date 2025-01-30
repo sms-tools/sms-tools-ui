@@ -2,6 +2,7 @@
 import ContactList from '@/components/ContactList.vue';
 import SmsList from '@/components/SmsList.vue';
 import request from '@/stores/requestManager';
+import { clearPhone, IsPhoneNumber } from '@/stores/tools';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -31,8 +32,14 @@ async function search() {
 
 async function send() {
   try {
+    let body = {};
+    if (IsPhoneNumber(clearPhone(identifier.value))) {
+      body = { phoneNumber: identifier.value };
+    } else {
+      body = { ContactID: identifier.value };
+    }
     const sendResult = (await request('sendSms', 'post', {
-      phone: phone.value,
+      ...body,
       message: sendMessage.value,
     })) as { body: { data: { message: Message } }; status: 500 | 200 | number } | void;
     if (!sendResult || sendResult.status != 200) {

@@ -17,7 +17,8 @@ const contact = ref<
       contactName: string;
       contactPhoneNumber: string;
       createDate: string;
-      nbCharExchanged: number;
+      nbCharExchangedIn: number;
+      nbCharExchangedOut: number;
       nbMessageIn: number;
       nbMessageOut: number;
       timeForFirstMessage: string;
@@ -45,7 +46,8 @@ async function search() {
     typeof response.body.contactName == 'string' &&
     typeof response.body.contactPhoneNumber == 'string' &&
     typeof response.body.createDate == 'string' &&
-    typeof response.body.nbCharExchanged == 'number' &&
+    typeof response.body.nbCharExchangedIn == 'number' &&
+    typeof response.body.nbCharExchangedOut == 'number' &&
     typeof response.body.nbMessageIn == 'number' &&
     typeof response.body.nbMessageOut == 'number' &&
     typeof response.body.timeForFirstMessage == 'string' &&
@@ -56,7 +58,8 @@ async function search() {
       contactName: string;
       contactPhoneNumber: string;
       createDate: string;
-      nbCharExchanged: number;
+      nbCharExchangedIn: number;
+      nbCharExchangedOut: number;
       nbMessageIn: number;
       nbMessageOut: number;
       timeForFirstMessage: string;
@@ -66,33 +69,42 @@ async function search() {
     error.value = 'Invalid response data';
     console.error(error.value);
   }
-  console.log(response.body);
+}
+
+function copyToClipboard() {
+  if (contact.value?.contactPhoneNumber) {
+    navigator.clipboard
+      .writeText(contact.value.contactPhoneNumber)
+      .then(() => {
+        console.log('truc');
+      })
+      .catch((err) => console.error('error in copy', err));
+  }
 }
 </script>
-
 <template>
   <div v-if="contact" class="contactInfo">
-    <h1>information de {{ contact.contactName }}</h1>
+    <h1>Information de {{ contact.contactName }}</h1>
     <span>
       <span>
-        <div>date d'inscription</div>
+        <div>Date d'inscription</div>
         <div>{{ new Date(contact.createDate).toLocaleString() }}</div>
       </span>
       <span>
-        <div>date du premier message</div>
+        <div>Date du premier message</div>
         <div>{{ new Date(contact.timeForFirstMessage).toLocaleString() }}</div>
       </span>
       <span>
-        <div>date du dernier message</div>
+        <div>Date du dernier message</div>
         <div>{{ new Date(contact.timeForLastMessage).toLocaleString() }}</div>
       </span>
       <span>
-        <div>nombre de message</div>
-        <div class="messageExchange">
+        <div>Nombre de messages</div>
+        <div class="Exchange">
           {{ contact.nbMessageIn + contact.nbMessageOut }} message{{
             contact.nbMessageIn + contact.nbMessageOut > 1 ? 's' : ''
           }}
-          <div class="messageExchangeVisu">
+          <div class="ExchangeVisu">
             <div
               :style="{
                 width:
@@ -113,12 +125,46 @@ async function search() {
         </div>
       </span>
       <span>
-        <div>nombre de mot{{ contact.nbCharExchanged > 1 ? 's' : '' }} échanger</div>
-        <div>{{ contact.nbCharExchanged }}</div>
+        <div>
+          Nombre de mot{{ contact.nbCharExchangedIn + contact.nbCharExchangedOut > 1 ? 's' : '' }}
+          échangés
+        </div>
+        <div class="Exchange">
+          {{ contact.nbCharExchangedIn + contact.nbCharExchangedOut }} mot{{
+            contact.nbCharExchangedIn + contact.nbCharExchangedOut > 1 ? 's' : ''
+          }}
+          <div class="ExchangeVisu">
+            <div
+              :style="{
+                width:
+                  (contact.nbCharExchangedOut /
+                    (contact.nbCharExchangedIn + contact.nbCharExchangedOut)) *
+                    100 +
+                  '%',
+              }"
+            >
+              {{ contact.nbCharExchangedOut }}
+            </div>
+            <div
+              :style="{
+                width:
+                  (contact.nbCharExchangedIn /
+                    (contact.nbCharExchangedIn + contact.nbCharExchangedOut)) *
+                    100 +
+                  '%',
+              }"
+            >
+              {{ contact.nbCharExchangedIn }}
+            </div>
+          </div>
+        </div>
       </span>
       <span>
-        <div>numero de télephone</div>
-        <div>{{ contact.contactPhoneNumber }}</div>
+        <div>Numéro de téléphone</div>
+        <div class="copy" @click="copyToClipboard" style="cursor: pointer">
+          {{ contact.contactPhoneNumber }}
+          <img src="../../../src/assets/copy.svg" />
+        </div>
       </span>
     </span>
   </div>
@@ -135,11 +181,11 @@ span span {
 span span:hover {
   background-color: var(--white);
 }
-.messageExchange {
+.Exchange {
   display: flex;
   gap: 2vw;
 }
-.messageExchangeVisu {
+.ExchangeVisu {
   display: flex;
   text-align: center;
   width: 10vw;
@@ -152,15 +198,47 @@ span span:hover {
   height: 100%;
 }
 
-.messageExchangeVisu :nth-child(1) {
+.ExchangeVisu :nth-child(1) {
   background-color: var(--blue);
   border-radius: var(--radius) 0 0 var(--radius);
   color: white;
   min-width: 1em;
 }
-.messageExchangeVisu :nth-child(2) {
+.ExchangeVisu :nth-child(2) {
   background-color: var(--green);
   border-radius: 0 var(--radius) var(--radius) 0;
   min-width: 1em;
+}
+
+.copy:hover {
+  background-color: white;
+}
+
+.copy {
+  border-radius: var(--radius);
+  padding: 0 1vh;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.copy img {
+  height: 1em;
+}
+
+/* no in transition, but transition is active for out of click */
+.copy {
+  background-color: white;
+  transition: background-color 100ms ease-in-out 1s;
+}
+
+.copy:active {
+  background-color: var(--green);
+  transition: none;
+}
+
+.copy.released {
+  transition: background-color 100ms ease-in-out 1s;
+  background-color: white;
 }
 </style>
