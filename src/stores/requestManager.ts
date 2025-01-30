@@ -13,7 +13,12 @@ async function request(
   method: RequestInit['method'] = 'get',
   body = {},
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Promise<{ status: number; body: Record<string, any> } | void> {
+): Promise<{
+  status: number;
+  body: {
+    [key: string]: any;
+  };
+} | void> {
   const apiLink = localStorage.getItem('apiLink');
   const token = localStorage.getItem('authToken');
 
