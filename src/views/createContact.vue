@@ -51,7 +51,7 @@ async function submit() {
         type="tel"
         pattern="[0-9]{10}"
         required
-        placeholder="Phone number"
+        placeholder="numero de télephone"
       />
       <button type="submit">Create</button>
     </form>

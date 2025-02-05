@@ -3,13 +3,15 @@ import LoginPage from '../views/LoginPage.vue';
 import HomePage from '../views/HomePage.vue';
 import SmsPage from '@/views/SmsPage.vue';
 import createContact from '@/views/createContact.vue';
-import ContactPage from '@/views/contactPage.vue';
+import ContactPage from '@/views/ContactPage.vue';
+import SendMasseSms from '@/views/SendMasseSms.vue';
 
 const routes = [
   { path: '/login', name: 'Login', component: LoginPage },
   { path: '/', name: 'Home', component: HomePage, meta: { requiresAuth: true } },
   { path: '/sms', name: 'sms', component: SmsPage, meta: { requiresAuth: true } },
-  { path: '/contact', name: 'contac', component: ContactPage, meta: { requiresAuth: true } },
+  { path: '/contact', name: 'contact', component: ContactPage, meta: { requiresAuth: true } },
+  { path: '/manySms', name: 'many sms', component: SendMasseSms /*meta: { requiresAuth: true }*/ },
   {
     path: '/createContact',
     name: 'createContact',
