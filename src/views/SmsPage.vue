@@ -114,7 +114,7 @@ async function send() {
   </div>
 </template>
 
-<style>
+<style scoped>
 .sms-page {
   background-color: var(--white);
 }

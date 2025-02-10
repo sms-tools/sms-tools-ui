@@ -101,7 +101,7 @@ async function loadMessages() {
   </ul>
 </template>
 
-<style>
+<style scoped>
 .smsElement ul {
   gap: 10px;
   height: 86vh;

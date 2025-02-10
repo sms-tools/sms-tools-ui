@@ -48,7 +48,7 @@ function handleFileUpload(event: Event) {
 
 <template>
   <form @submit.prevent="submit">
-    <h1>Selection un fichier</h1>
+    <h1>Selectionner un fichier</h1>
     <div></div>
     <input type="file" @change="handleFileUpload" accept=".tsv" />
     <h1>ajouter des utilisateur</h1>
@@ -76,7 +76,7 @@ function handleFileUpload(event: Event) {
   </ul>
 </template>
 
-<style>
+<style scoped>
 form {
   display: flex;
   flex-direction: column;

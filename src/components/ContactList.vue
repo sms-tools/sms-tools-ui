@@ -105,7 +105,7 @@ getContact();
   </div>
 </template>
 
-<style>
+<style scoped>
 .contactListComp {
   padding: 1vh;
   background-color: white;
