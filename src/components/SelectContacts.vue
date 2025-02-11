@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-const usrList = ref<Array<[string /*name*/, string /*phone*/]>>([]);
+const usrList = defineModel<Array<[string /*name*/, string /*phone*/]>>();
 const phoneNumber = ref<string>('');
 const userName = ref<string>('');
 
 function submit() {
-  usrList.value.push([userName.value, phoneNumber.value]);
+  if (!usrList.value) usrList.value = [[userName.value, phoneNumber.value]];
+  else usrList.value.push([userName.value, phoneNumber.value]);
   phoneNumber.value = '';
   userName.value = '';
 }
@@ -37,7 +38,8 @@ function handleFileUpload(event: Event) {
         }
 
         if (name && phone) {
-          usrList.value.push([name.trim(), phone.trim()]);
+          if (!usrList.value) usrList.value = [[name.trim(), phone.trim()]];
+          else usrList.value.push([name.trim(), phone.trim()]);
         }
       });
     };
@@ -47,36 +49,42 @@ function handleFileUpload(event: Event) {
 </script>
 
 <template>
-  <form @submit.prevent="submit">
-    <h1>Selectionner un fichier</h1>
-    <div></div>
-    <input type="file" @change="handleFileUpload" accept=".tsv" />
-    <h1>ajouter des utilisateur</h1>
-    <div class="form">
-      <label for="name">Nom du client</label>
-      <input id="name" v-model="userName" placeholder="nom du client" />
-      <label for="phone">Numero de téléphone</label>
-      <input
-        id="phone"
-        v-model="phoneNumber"
-        type="tel"
-        pattern="[0-9]{10}"
-        required
-        placeholder="numero de télephone"
-      />
-    </div>
-    <button type="submit">ajouter ce contact</button>
-  </form>
+  <div class="selectContactComposent">
+    <form @submit.prevent="submit">
+      <h1>Selectionner un fichier</h1>
+      <input type="file" @change="handleFileUpload" accept=".tsv" />
+      <h1>ajouter des utilisateur</h1>
+      <div class="form">
+        <label for="name">Nom du client</label>
+        <input type="text" id="name" v-model="userName" placeholder="nom du client" />
+        <label for="phone">Numero de téléphone</label>
+        <input
+          id="phone"
+          v-model="phoneNumber"
+          type="tel"
+          pattern="[0-9]{10}"
+          required
+          placeholder="numero de télephone"
+        />
+      </div>
+      <button type="submit">ajouter ce contact</button>
+    </form>
 
-  <ul>
-    <li v-if="usrList.length != 0" v-for="usr in usrList">
-      <div>{{ usr[0] }}: {{ usr[1] }}</div>
-    </li>
-    <div v-else>Aucun contact séléctionné</div>
-  </ul>
+    <ul>
+      <li v-if="usrList && usrList?.length != 0" v-for="usr in usrList">
+        <div>{{ usr[0] }}: {{ usr[1] }}</div>
+      </li>
+      <li v-else class="errorContact">Aucun contact séléctionné</li>
+    </ul>
+  </div>
 </template>
 
 <style scoped>
+.selectContactComposent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
 form {
   display: flex;
   flex-direction: column;
@@ -94,9 +102,22 @@ form {
 
 ul {
   list-style: none;
+  background-color: var(--white);
+  border-radius: calc(var(--radius) - 1vh);
+  margin-top: 1vh;
+  height: 100%;
+  overflow: scroll;
 }
 
-input {
+input[type='text'],
+input[type='tel'] {
   border: none;
+  background-color: var(--white);
+  border-radius: calc(var(--radius) - 1vh);
+  padding: 0 0.5em;
+}
+
+.errorContact {
+  text-align: center;
 }
 </style>

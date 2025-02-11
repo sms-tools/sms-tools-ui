@@ -23,7 +23,7 @@ const currentContact = ref<string | undefined>();
   </div>
 </template>
 
-<style lang="css">
+<style lang="css" scoped>
 section {
   margin: 2vh;
   padding: 2vh;

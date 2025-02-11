@@ -21,19 +21,21 @@ async function ping() {
   if (response && response.status == 200) state.value = 'online';
   else if (!response || response.status != 200) state.value = 'errored';
 }
+ping();
 </script>
 <template>
   <h1>etat</h1>
   <div class="state">
     <div class="connection">
       connexion:
+      <span class="circle" v-bind:class="state" />
       {{ state === 'online' ? 'en ligne' : state === 'offline' ? 'hors ligne' : 'erreur' }}
-      <span v-bind:class="state" />
     </div>
   </div>
+  <h1>avancement</h1>
 </template>
 
-<style>
+<style scoped>
 .connection {
   display: flex;
   align-items: center;
@@ -44,11 +46,23 @@ img {
   margin: 0.2vw;
 }
 
-.offline {
-  background-color: var(--red);
+.circle {
   height: 1em;
   width: 1em;
   border-radius: 50%;
   position: relative;
+}
+.offline {
+  background-color: var(--red);
+}
+
+.online {
+  background-color: var(--green);
+}
+
+h1 {
+  text-align: center;
+  border-bottom: 2px solid var(--blue);
+  margin: 2vh;
 }
 </style>
