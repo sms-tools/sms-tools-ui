@@ -163,7 +163,7 @@ function copyToClipboard() {
         <div>Numéro de téléphone</div>
         <div class="copy" @click="copyToClipboard" style="cursor: pointer">
           {{ contact.contactPhoneNumber }}
-          <img src="../../../src/assets/copy.svg" />
+          <img src="../assets/copy.svg" />
         </div>
       </span>
     </span>
