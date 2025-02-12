@@ -11,7 +11,11 @@ const routes = [
   { path: '/', name: 'Home', component: HomePage, meta: { requiresAuth: true } },
   { path: '/sms', name: 'sms', component: SmsPage, meta: { requiresAuth: true } },
   { path: '/contact', name: 'contact', component: ContactPage, meta: { requiresAuth: true } },
-  { path: '/manySms', name: 'many sms', component: SendMasseSms, meta: { requiresAuth: true } },
+  {
+    path: '/manySms',
+    name: 'many sms',
+    component: SendMasseSms /*, meta: { requiresAuth: true }*/,
+  },
   {
     path: '/createContact',
     name: 'createContact',

@@ -3,6 +3,8 @@ import { ref } from 'vue';
 
 const state = ref<'offline' | 'online' | 'errored'>('offline');
 const errorMessage = ref('');
+const usrList =
+  defineModel<Array<[string /*name*/, string /*phone*/, string | undefined /*status*/]>>();
 
 async function ping() {
   let apiLink = localStorage.getItem('apiLink');
@@ -24,18 +26,31 @@ async function ping() {
 ping();
 </script>
 <template>
-  <h1>etat</h1>
-  <div class="state">
-    <div class="connection">
-      connexion:
-      <span class="circle" v-bind:class="state" />
-      {{ state === 'online' ? 'en ligne' : state === 'offline' ? 'hors ligne' : 'erreur' }}
+  <div class="sendToManyContactsStats">
+    <h1>etat</h1>
+    <div class="state">
+      <div class="connection">
+        connexion:
+        <span class="circle" v-bind:class="state" />
+        {{ state === 'online' ? 'en ligne' : state === 'offline' ? 'hors ligne' : 'erreur' }}
+      </div>
     </div>
+    <h1>avancement</h1>
+    <ul>
+      <li v-if="usrList && usrList?.length != 0" v-for="usr in usrList">
+        <div>{{ usr[0] }}: {{ usr[1] }}</div>
+      </li>
+      <li v-else class="errorContact">Aucun contact</li>
+    </ul>
   </div>
-  <h1>avancement</h1>
 </template>
 
 <style scoped>
+.sendToManyContactsStats {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
 .connection {
   display: flex;
   align-items: center;
@@ -64,5 +79,14 @@ h1 {
   text-align: center;
   border-bottom: 2px solid var(--blue);
   margin: 2vh;
+}
+
+ul {
+  list-style: none;
+  background-color: var(--white);
+  border-radius: calc(var(--radius) - 1vh);
+  margin-top: 1vh;
+  height: 100%;
+  overflow: scroll;
 }
 </style>

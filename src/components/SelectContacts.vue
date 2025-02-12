@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-const usrList = defineModel<Array<[string /*name*/, string /*phone*/]>>();
+const usrList =
+  defineModel<Array<[string /*name*/, string /*phone*/, string | undefined /*status*/]>>();
 const phoneNumber = ref<string>('');
 const userName = ref<string>('');
 
 function submit() {
-  if (!usrList.value) usrList.value = [[userName.value, phoneNumber.value]];
-  else usrList.value.push([userName.value, phoneNumber.value]);
+  if (!usrList.value) usrList.value = [[userName.value, phoneNumber.value, undefined]];
+  else usrList.value.push([userName.value, phoneNumber.value, undefined]);
   phoneNumber.value = '';
   userName.value = '';
 }
@@ -38,8 +39,8 @@ function handleFileUpload(event: Event) {
         }
 
         if (name && phone) {
-          if (!usrList.value) usrList.value = [[name.trim(), phone.trim()]];
-          else usrList.value.push([name.trim(), phone.trim()]);
+          if (!usrList.value) usrList.value = [[name.trim(), phone.trim(), undefined]];
+          else usrList.value.push([name.trim(), phone.trim(), undefined]);
         }
       });
     };

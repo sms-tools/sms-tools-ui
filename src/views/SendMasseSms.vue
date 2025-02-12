@@ -3,7 +3,7 @@ import SelectContacts from '@/components/SelectContacts.vue';
 import SendToManyContactStatus from '@/components/sendToManyContactStatus.vue';
 import { ref } from 'vue';
 
-const contacts = ref<Array<[string, string]>>();
+const contacts = ref<Array<[string /*name*/, string /*phone*/, string | undefined /*status*/]>>();
 const createIfDosntExist = ref<boolean>(false);
 const message = ref<string>();
 
@@ -27,13 +27,15 @@ async function sendMassSms() {}
             placeholder="message a envoyer"
           />
           <label for="createIfDosntExist">crée le contact si il n'existe pas</label>
-          <input type="checkbox" id="createIfDosntExist" v-model="createIfDosntExist" />
+          <div class="check">
+            <input type="checkbox" id="createIfDosntExist" v-model="createIfDosntExist" />
+          </div>
           <button>envoyer les messages</button>
         </form>
       </section>
     </div>
     <section class="sendingStatus">
-      <SendToManyContactStatus />
+      <SendToManyContactStatus v-model="contacts" />
     </section>
   </div>
 </template>
@@ -67,6 +69,13 @@ input[type='text'] {
   padding: 0 0.5em;
 }
 
+.check {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  padding: 0 0 0 1em;
+}
+
 .selection {
   height: 96vh;
   width: 34vw;
@@ -92,7 +101,7 @@ input[type='text'] {
   box-shadow: 0px 0px 10px rgba(200, 200, 200, 0.25);
 }
 
-.SelectManyContacts > form > button {
+.send > form > button {
   grid-column: 1 / 3;
 }
 
