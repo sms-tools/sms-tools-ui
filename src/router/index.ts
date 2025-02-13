@@ -14,7 +14,8 @@ const routes = [
   {
     path: '/manySms',
     name: 'many sms',
-    component: SendMasseSms /*, meta: { requiresAuth: true }*/,
+    component: SendMasseSms,
+    meta: { requiresAuth: true },
   },
   {
     path: '/createContact',

@@ -29,7 +29,6 @@ watch(
 
 const messages = ref<Array<Message> | undefined>([]);
 const error = ref<string | undefined>();
-let sseReader: ReadableStreamDefaultReader<Uint8Array> | null = null;
 
 async function loadMessages() {
   if (!props.identifier) return;
@@ -68,7 +67,6 @@ async function loadMessages() {
   }
 
   const reader = response.body.getReader();
-  sseReader = reader;
   const decoder = new TextDecoder('utf-8');
 
   while (true) {

@@ -6,8 +6,12 @@ import { ref } from 'vue';
 const contacts = ref<Array<[string /*name*/, string /*phone*/, string | undefined /*status*/]>>();
 const createIfDosntExist = ref<boolean>(false);
 const message = ref<string>();
-
-async function sendMassSms() {}
+const SendToManyContactStatusRef = ref();
+async function sendMassSms() {
+  if (SendToManyContactStatusRef.value) {
+    SendToManyContactStatusRef.value.send(createIfDosntExist.value, message.value);
+  }
+}
 </script>
 
 <template>
@@ -35,7 +39,7 @@ async function sendMassSms() {}
       </section>
     </div>
     <section class="sendingStatus">
-      <SendToManyContactStatus v-model="contacts" />
+      <SendToManyContactStatus v-model="contacts" ref="SendToManyContactStatusRef" />
     </section>
   </div>
 </template>
