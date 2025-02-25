@@ -5,7 +5,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
+    "build": "vite build --mode production --outDir ../build/ --emptyOutDir",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",

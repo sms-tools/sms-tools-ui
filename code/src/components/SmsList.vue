@@ -29,8 +29,14 @@ watch(
 
 const messages = ref<Array<Message> | undefined>([]);
 const error = ref<string | undefined>();
+const readerRef = ref<ReadableStreamDefaultReader<Uint8Array<ArrayBufferLike>> | null>(null);
 
 async function loadMessages() {
+  console.log('load', readerRef.value);
+  if (readerRef.value) {
+    await readerRef.value.cancel();
+    readerRef.value = null;
+  }
   if (!props.identifier) return;
 
   //define body type
@@ -66,11 +72,11 @@ async function loadMessages() {
     return;
   }
 
-  const reader = response.body.getReader();
+  readerRef.value = response.body.getReader();
   const decoder = new TextDecoder('utf-8');
 
   while (true) {
-    const { value, done } = await reader.read();
+    const { value, done } = await readerRef.value.read();
     if (done) break;
 
     const decodedValue = decoder.decode(value);
