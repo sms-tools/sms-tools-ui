@@ -19,7 +19,7 @@ const phone = ref((route.query.phone || '') as string);
 const identifier = ref<string>(phone.value || '');
 
 const sendMessage = ref('');
-const lastMessage = ref<Message | undefined>(undefined);
+const receviedEvent = ref<sseEvent | undefined>(undefined);
 const sendStatus = ref<undefined | 'send' | 'errored'>(undefined);
 const popUpVisible = ref(false);
 
@@ -49,13 +49,47 @@ async function send() {
 
     sendMessage.value = '';
     sendStatus.value = 'send';
-    lastMessage.value = sendResult.body.data.message;
   } catch (error) {
     console.error(error);
     sendStatus.value = 'send';
     return;
   }
 }
+
+//for all new message, reading, sending
+async function newEvent() {
+  //create sse connection
+  const response = await fetch(`${localStorage.getItem('apiLink')}getNewEvent`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+    },
+  });
+
+  if (!response.ok || !response.body) {
+    console.error('Failed to establish SSE connection.');
+    return;
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+
+    const decodedValue = decoder.decode(value);
+
+    try {
+      const newEvent = JSON.parse(decodedValue) as sseEvent;
+      receviedEvent.value = newEvent;
+    } catch (error) {
+      console.error('Error parsing SSE message:', error);
+    }
+  }
+}
+newEvent();
 </script>
 
 <template>
@@ -85,20 +119,12 @@ async function send() {
             identifier = id;
           }
         "
-        :lastMessage="lastMessage"
+        :receviedEvent="receviedEvent"
       />
     </section>
     <!-- message -->
     <section class="smsElement">
-      <SmsList
-        :identifier="identifier"
-        :lastMessage="lastMessage"
-        :sseDos="
-          (message: Message) => {
-            lastMessage = message;
-          }
-        "
-      />
+      <SmsList :identifier="identifier" :receviedEvent="receviedEvent" />
       <form v-if="identifier" @submit.prevent="send" class="sending">
         <input
           type="text"

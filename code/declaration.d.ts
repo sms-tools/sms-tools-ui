@@ -1,18 +1,47 @@
 type Message = {
-  _id: string;
   date: Date;
   contactID: string | undefined;
   senderID: string | undefined;
   message: string;
   direction: boolean; // in or out in: true, out: false
   status: 'received' | 'sent' | 'delivered' | 'failed' | 'pending';
-  messageId: string | undefined; // id from gateway
   deliveredAt: Date | undefined;
   sendAt: Date | undefined;
+  messageID: string;
 };
 
 type contact = {
   createDate: Date;
   phoneNumber: String;
   contactName: String;
+};
+
+type sseEvent = {
+  contactID: string;
+  messageID: string;
+  event: 'send' | 'delivered' | 'failed' | 'recevied';
+  status: sendEvent | deliveredEvent | failedEvent | receivedEvent;
+};
+
+type sendEvent = {
+  userID: mongoose.Schema.ObjectId;
+  message: string;
+  sendAt: Date;
+  contactName: string;
+  phoneNumber: string;
+};
+
+type deliveredEvent = {
+  deliveredAt: Date;
+};
+
+type failedEvent = {
+  deliveredAt: Date;
+};
+
+type receivedEvent = {
+  deliveredAt: Date;
+  message: string;
+  contactName: string;
+  phoneNumber: string;
 };

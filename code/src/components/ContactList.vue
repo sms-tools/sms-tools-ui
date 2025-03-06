@@ -7,30 +7,69 @@ const props = defineProps({
     type: Function as PropType<(id: string) => void>,
     required: true,
   },
-  lastMessage: {
-    type: Object as PropType<Message | undefined>,
+  receviedEvent: {
+    type: Object as PropType<sseEvent | undefined>,
     required: false,
   },
 });
-watch(
-  () => props.lastMessage,
-  () => {
-    if (!props.lastMessage) return;
-    const BeforeMessage = contacts.value.get(props.lastMessage.contactID ?? '');
-    contacts.value.set(props.lastMessage.contactID ?? '', {
-      contactName: BeforeMessage?.contactName ?? '',
-      phoneNumber: BeforeMessage?.phoneNumber ?? '',
-      message: props.lastMessage.message,
-      date: props.lastMessage.date,
-      senderID: props.lastMessage.senderID,
-      direction: props.lastMessage.direction,
-      status: props.lastMessage.status,
-      deliveredAt: props.lastMessage.deliveredAt,
-      sendAt: props.lastMessage.sendAt,
+watch(() => props.receviedEvent, newEvent, { immediate: true });
+
+async function newEvent() {
+  if (!props.receviedEvent) return;
+  if (props.receviedEvent.event == 'recevied') {
+    const receved = props.receviedEvent as {
+      contactID: string;
+      messageID: string;
+      event: 'recevied';
+      status: receivedEvent;
+    };
+    contacts.value.set(props.receviedEvent.contactID, {
+      contactName: receved.status.contactName,
+      phoneNumber: receved.status.phoneNumber,
+      message: receved.status.message,
+      date: receved.status.deliveredAt,
+      senderID: undefined,
+      direction: true,
+      status: 'received',
+      deliveredAt: receved.status.deliveredAt,
+      sendAt: undefined,
+      messageID: receved.messageID,
     });
-  },
-  { immediate: true },
-);
+  } else if (props.receviedEvent.event == 'send') {
+    const send = props.receviedEvent as {
+      contactID: string;
+      messageID: string;
+      event: 'send';
+      status: sendEvent;
+    };
+    contacts.value.set(props.receviedEvent.contactID, {
+      contactName: send.status.contactName,
+      phoneNumber: send.status.phoneNumber,
+      message: send.status.message,
+      date: send.status.sendAt,
+      senderID: undefined,
+      direction: true,
+      status: 'sent',
+      deliveredAt: send.status.sendAt,
+      sendAt: undefined,
+      messageID: send.messageID,
+    });
+  } else {
+    const oldMessage = contacts.value.get(props.receviedEvent.contactID);
+    //if last message is same of the event message
+    if (oldMessage && oldMessage.messageID == props.receviedEvent.messageID) {
+      if (props.receviedEvent.event == 'delivered') {
+        const delivred = props.receviedEvent as {
+          status: deliveredEvent;
+        };
+        oldMessage.deliveredAt = delivred.status.deliveredAt;
+      }
+
+      oldMessage.status == props.receviedEvent.event;
+      contacts.value.set(props.receviedEvent.contactID, oldMessage);
+    }
+  }
+}
 
 const contacts = ref<
   Map<
@@ -39,6 +78,7 @@ const contacts = ref<
       contactName: string;
       phoneNumber: string;
       message: string;
+      messageID: string;
       date: Date;
       senderID: string | undefined;
       direction: boolean;
@@ -63,6 +103,7 @@ async function getContact() {
       status: 'received' | 'sent' | 'delivered' | 'failed' | 'pending';
       deliveredAt: Date;
       sendAt: Date;
+      messageID: string;
     }>;
     status: number;
   } | void;
