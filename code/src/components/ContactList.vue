@@ -20,12 +20,13 @@ async function newEvent() {
     const receved = props.receviedEvent as {
       contactID: string;
       messageID: string;
+      phoneNumber: string;
       event: 'recevied';
       status: receivedEvent;
     };
     contacts.value.set(props.receviedEvent.contactID, {
       contactName: receved.status.contactName,
-      phoneNumber: receved.status.phoneNumber,
+      phoneNumber: receved.phoneNumber,
       message: receved.status.message,
       date: receved.status.deliveredAt,
       senderID: undefined,
@@ -39,12 +40,13 @@ async function newEvent() {
     const send = props.receviedEvent as {
       contactID: string;
       messageID: string;
+      phoneNumber: string;
       event: 'send';
       status: sendEvent;
     };
     contacts.value.set(props.receviedEvent.contactID, {
       contactName: send.status.contactName,
-      phoneNumber: send.status.phoneNumber,
+      phoneNumber: send.phoneNumber,
       message: send.status.message,
       date: send.status.sendAt,
       senderID: undefined,

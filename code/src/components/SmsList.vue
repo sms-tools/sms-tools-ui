@@ -20,9 +20,16 @@ const error = ref<string | undefined>();
 const readerRef = ref<ReadableStreamDefaultReader<Uint8Array<ArrayBufferLike>> | null>(null);
 
 async function newEvent() {
-  if (!props.receviedEvent) return;
-  //if new message is receved
+  //if propos is undefined or nes event is not for current contact
+  if (
+    !props.receviedEvent ||
+    (props.receviedEvent.contactID != props.identifier &&
+      props.receviedEvent.phoneNumber != props.identifier)
+  )
+    return;
+
   if (props.receviedEvent.event == 'recevied') {
+    //if new message is receved
     //optimise type
     const receved = props.receviedEvent as {
       contactID: string;
