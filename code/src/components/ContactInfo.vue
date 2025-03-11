@@ -14,7 +14,7 @@ const error = ref<String | undefined>();
 const contact = ref<
   | {
       contactID: string;
-      contactName: string;
+      contactName: string | undefined;
       contactPhoneNumber: string;
       createDate: string;
       nbCharExchangedIn: number;
@@ -55,7 +55,7 @@ async function search() {
   ) {
     contact.value = response.body as {
       contactID: string;
-      contactName: string;
+      contactName: string | undefined;
       contactPhoneNumber: string;
       createDate: string;
       nbCharExchangedIn: number;

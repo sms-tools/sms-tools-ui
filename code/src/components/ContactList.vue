@@ -77,7 +77,7 @@ const contacts = ref<
   Map<
     string,
     {
-      contactName: string;
+      contactName: string | undefined;
       phoneNumber: string;
       message: string;
       messageID: string;
@@ -96,7 +96,7 @@ async function getContact() {
   const fetchContact = (await request('getContact', 'post')) as {
     body: Array<{
       contactID: string;
-      contactName: string;
+      contactName: string | undefined;
       phoneNumber: string;
       message: string;
       date: Date;
@@ -110,9 +110,11 @@ async function getContact() {
     status: number;
   } | void;
 
-  if (!fetchContact || fetchContact.status != 200) {
+  if (!fetchContact || typeof fetchContact != 'object' || fetchContact.status != 200) {
     errored.value =
-      "l'erreur " + (fetchContact?.status ?? '500') + 'est survenu. réésayer plus tard';
+      "l'erreur " +
+      (fetchContact && fetchContact.status ? fetchContact.status : '500') +
+      ' est survenu. réésayer plus tard';
     return;
   }
   fetchContact.body.forEach((Element) => {
@@ -130,7 +132,7 @@ getContact();
       <li v-for="[contactID, contact] in contacts">
         <div class="contactEmbed" v-on:click="props.changeContact(contactID)">
           <div class="textPart">
-            <div class="conactName">{{ contact.contactName }}</div>
+            <div class="conactName">{{ contact.contactName ?? contact.phoneNumber }}</div>
             <div class="lastMessage">{{ contact.message }}</div>
           </div>
           <div class="metaPart">
