@@ -7,8 +7,12 @@ import { RouterView } from 'vue-router';
     <header>
       <img src="../src/assets/logo.svg" />
       <RouterLink class="link" to="/ui/sms"><img src="../src/assets/smsNetral.svg" /></RouterLink>
-      <RouterLink class="link" to="/ui/contact">Contact</RouterLink>
-      <div>Contact</div>
+      <RouterLink class="link" to="/ui/contact"
+        ><img src="../src/assets/smsNetral.svg"
+      /></RouterLink>
+      <RouterLink class="link" to="/ui/contact"
+        ><img src="../src/assets/contactBook.svg"
+      /></RouterLink>
     </header>
     <RouterView class="router" />
   </div>
