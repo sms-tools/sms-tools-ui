@@ -6,7 +6,7 @@ import { app } from "../..";
 function router() {
   const route = Router();
 
-  app.use(express.static(path.join(__dirname, "build")));
+  route.use(express.static(path.join(__dirname, "build")));
   route.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "build", "index.html"));
   });

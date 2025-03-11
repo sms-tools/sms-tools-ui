@@ -6,10 +6,11 @@ import vueDevTools from 'vite-plugin-vue-devtools';
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  const apiLink = mode === 'development' ? 'https://localhost:8080/api/' : '/api/';
   return {
-    define: {
-      'process.env.VITE_API_LINK': JSON.stringify(apiLink),
+    base: './',
+    build: {
+      outDir: '../build',
+      emptyOutDir: true,
     },
     plugins: [vue(), vueJsx(), vueDevTools()],
     resolve: {
@@ -24,11 +25,20 @@ export default defineConfig(({ mode }) => {
               '/api': {
                 target: 'https://localhost:8080',
                 changeOrigin: true,
-                secure: false, // Désactive la vérification du certificat SSL
+                secure: false, //ssl
                 rewrite: (path) => path.replace(/^\/api/, 'https://127.0.0.1:8080/api'),
               },
             },
           }
-        : {},
+        : {
+            proxy: {
+              '/api': {
+                target: 'https://sms.mpqa.fr/api',
+                changeOrigin: true,
+                secure: true,
+                rewrite: (path) => path.replace(/^\/api/, 'https://sms.mpqa.fr/api'),
+              },
+            },
+          },
   };
 });

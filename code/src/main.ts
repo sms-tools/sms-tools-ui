@@ -11,6 +11,9 @@ const app = createApp(App);
 app.use(createPinia());
 app.use(router);
 
-localStorage.setItem('apiLink', '/api/');
+localStorage.setItem(
+  'apiLink',
+  import.meta.env.MODE === 'development' ? `/api/` : 'sms.mpqa.fr/api/',
+);
 
 app.mount('#app');
