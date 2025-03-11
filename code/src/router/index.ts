@@ -7,18 +7,18 @@ import ContactPage from '@/views/ContactPage.vue';
 import SendMasseSms from '@/views/SendMasseSms.vue';
 
 const routes = [
-  { path: '/login', name: 'Login', component: LoginPage },
-  { path: '/', name: 'Home', component: HomePage, meta: { requiresAuth: true } },
-  { path: '/sms', name: 'sms', component: SmsPage, meta: { requiresAuth: true } },
-  { path: '/contact', name: 'contact', component: ContactPage, meta: { requiresAuth: true } },
+  { path: '/ui/login', name: 'Login', component: LoginPage },
+  { path: '/ui/', name: 'Home', component: HomePage, meta: { requiresAuth: true } },
+  { path: '/ui/sms', name: 'sms', component: SmsPage, meta: { requiresAuth: true } },
+  { path: '/ui/contact', name: 'contact', component: ContactPage, meta: { requiresAuth: true } },
   {
-    path: '/manySms',
+    path: '/ui/manySms',
     name: 'many sms',
     component: SendMasseSms,
     meta: { requiresAuth: true },
   },
   {
-    path: '/createContact',
+    path: '/ui/createContact',
     name: 'createContact',
     component: createContact,
     meta: { requiresAuth: true },
@@ -34,7 +34,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('authToken'); // get if your are connected
   if (to.meta.requiresAuth && !isAuthenticated) {
-    next('/login'); // swich to login page
+    next('/ui/login'); // swich to login page
   } else {
     next();
   }

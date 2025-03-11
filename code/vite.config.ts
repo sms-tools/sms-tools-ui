@@ -30,15 +30,6 @@ export default defineConfig(({ mode }) => {
               },
             },
           }
-        : {
-            proxy: {
-              '/api': {
-                target: 'https://sms.mpqa.fr/api',
-                changeOrigin: true,
-                secure: true,
-                rewrite: (path) => path.replace(/^\/api/, 'https://sms.mpqa.fr/api'),
-              },
-            },
-          },
+        : {},
   };
 });
