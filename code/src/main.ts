@@ -11,6 +11,6 @@ const app = createApp(App);
 app.use(createPinia());
 app.use(router);
 
-localStorage.setItem('apiLink', 'https://localhost:8080/api/');
+localStorage.setItem('apiLink', '/api/');
 
 app.mount('#app');

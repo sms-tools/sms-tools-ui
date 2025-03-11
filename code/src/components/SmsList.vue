@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import request from '@/stores/requestManager';
 import { clearPhone, IsPhoneNumber } from '@/stores/tools';
-import { ref, watch, type PropType } from 'vue';
+import { nextTick, ref, watch, type PropType } from 'vue';
+
+const messages = ref<Array<Message> | undefined>([]);
+const error = ref<string | undefined>();
+const readerRef = ref<ReadableStreamDefaultReader<Uint8Array<ArrayBufferLike>> | null>(null);
 
 const props = defineProps({
   identifier: {
@@ -15,9 +19,16 @@ const props = defineProps({
 watch(() => props.identifier, loadMessages, { immediate: true });
 watch(() => props.receviedEvent, newEvent, { immediate: true });
 
-const messages = ref<Array<Message> | undefined>([]);
-const error = ref<string | undefined>();
-const readerRef = ref<ReadableStreamDefaultReader<Uint8Array<ArrayBufferLike>> | null>(null);
+function scrollToBottom() {
+  nextTick(() => {
+    const smsElement = document.querySelector('.smsElement ul');
+    if (smsElement) {
+      if (smsElement.scrollHeight > smsElement.clientHeight) {
+        smsElement.scrollTop = smsElement.scrollHeight;
+      }
+    }
+  });
+}
 
 async function newEvent() {
   //if propos is undefined or nes event is not for current contact
@@ -51,6 +62,7 @@ async function newEvent() {
     };
     if (Array.isArray(messages.value)) messages.value.push(message);
     else messages.value = [message];
+    scrollToBottom();
   }
   // for sending message
   else if ((props.receviedEvent.event = 'send')) {
@@ -135,6 +147,8 @@ async function loadMessages() {
   } catch (err) {
     console.error(err);
   }
+
+  scrollToBottom();
 }
 </script>
 
@@ -152,17 +166,18 @@ async function loadMessages() {
 </template>
 
 <style scoped>
-.smsElement ul {
+.smsElement {
   gap: 10px;
   height: 86vh;
-  margin: none;
+  margin: 0;
   display: flex;
-  overflow: scroll;
+  flex-direction: column;
   list-style: none;
   padding: 1vh;
   border-radius: var(--radius);
-  flex-direction: column;
   background-color: var(--white);
+  overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 .messageBox {

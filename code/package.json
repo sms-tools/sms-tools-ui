@@ -4,7 +4,7 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode development",
     "build": "vite build --mode production --outDir ../build/ --emptyOutDir",
     "preview": "vite preview",
     "build-only": "vite build",
@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.13.10",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitejs/plugin-vue-jsx": "^4.1.1",
     "@vue/eslint-config-prettier": "^10.1.0",
