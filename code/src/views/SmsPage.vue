@@ -97,7 +97,7 @@ newEvent();
     <!-- search -->
     <section class="searchPart">
       <form @submit.prevent="search">
-        <label for="phone">message</label>
+        <label for="phone">Numero : </label>
         <input
           id="phone"
           v-model="phone"
@@ -153,6 +153,19 @@ section {
 section.searchPart {
   width: 36.5vw;
   height: 96vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+}
+
+section.searchPart form {
+  border-radius: var(--radius);
+  background-color: white;
+  box-shadow: 0px 0px 10px rgba(200, 200, 200, 0.25);
+  padding: 1vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 section.smsElement {
@@ -167,8 +180,7 @@ form.sending {
   padding: 2vh 0px;
 }
 
-input#sendingText {
-  width: 89%;
+input {
   height: 4vh;
   border: none;
   padding: 0px 2%;
@@ -177,12 +189,28 @@ input#sendingText {
   background-color: var(--white);
 }
 
-button#sendButton {
-  width: 10%;
+input#sendingText {
+  width: 89%;
+}
+input#phone {
+  width: 100%;
+}
+
+label {
+  white-space: nowrap;
+  padding: 0 1vw;
+}
+
+button {
   border: none;
   background-color: var(--blue);
   color: white;
   height: 4vh;
   border-radius: var(--radius);
+  padding: 0 1vw;
+}
+
+button#sendButton {
+  width: 10%;
 }
 </style>
