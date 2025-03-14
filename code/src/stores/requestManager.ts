@@ -42,6 +42,6 @@ async function request(
 
 function newLogin() {
   localStorage.removeItem('authToken');
-  router.push('/login');
+  router.push('/ui/login');
 }
 export default request;

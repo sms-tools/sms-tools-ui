@@ -36,7 +36,7 @@ async function search() {
   }
   const response = await request('contactInfo', 'post', body);
   if (!response || response.status !== 200) {
-    error.value = `Erreur ${response?.status}`;
+    error.value = `Error ${response ? response?.status : 'with returned object'}`;
     console.error(error.value);
     return;
   }
