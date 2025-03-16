@@ -13,22 +13,15 @@ if you enter phone, identifier = phone
 if you send new message SmsList and ContactList update our list
 */
 
-const route = useRoute();
 //for user update
-const phone = ref((route.query.phone || '') as string);
-const identifier = ref<string>(phone.value || '');
+const route = useRoute();
+const identifier = ref<string>(typeof route.query.phone == 'string' ? route.query.phone : '');
 
 const sendMessage = ref('');
 const receviedEvent = ref<sseEvent | undefined>(undefined);
 const sendStatus = ref<undefined | 'send' | 'errored'>(undefined);
-const popUpVisible = ref(false);
 
 //if phone is in request
-if (phone.value != '') search();
-
-async function search() {
-  identifier.value = phone.value;
-}
 
 async function send() {
   try {
@@ -96,23 +89,6 @@ newEvent();
   <div class="sms-page">
     <!-- search -->
     <section class="searchPart">
-      <form @submit.prevent="search">
-        <label for="phone">Numero : </label>
-        <input
-          id="phone"
-          v-model="phone"
-          type="tel"
-          required
-          pattern="[0-9]{10}"
-          placeholder="Entrez un numéro de téléphone"
-        />
-        <button type="submit">Rechercher</button>
-      </form>
-      <!-- if not fond -->
-      <div v-if="popUpVisible">
-        cet utilisateur semble inconnus...
-        <a :href="`/createContact?phone=${phone}`">cliquez ici pour le créer</a>
-      </div>
       <ContactList
         :changeContact="
           (id) => {
@@ -147,7 +123,7 @@ newEvent();
 
 section {
   margin: 2vh;
-  padding: 2vh;
+  padding: var(--hGap);
 }
 
 section.searchPart {
@@ -155,17 +131,7 @@ section.searchPart {
   height: 96vh;
   display: flex;
   flex-direction: column;
-  gap: 1vh;
-}
-
-section.searchPart form {
-  border-radius: var(--radius);
-  background-color: white;
-  box-shadow: 0px 0px 10px rgba(200, 200, 200, 0.25);
-  padding: 1vh;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  gap: var(--vGap);
 }
 
 section.smsElement {
@@ -192,13 +158,10 @@ input {
 input#sendingText {
   width: 89%;
 }
-input#phone {
-  width: 100%;
-}
 
 label {
   white-space: nowrap;
-  padding: 0 1vw;
+  padding: 0 var(--vGap);
 }
 
 button {
@@ -207,7 +170,7 @@ button {
   color: white;
   height: 4vh;
   border-radius: var(--radius);
-  padding: 0 1vw;
+  padding: 0 var(--vGap);
 }
 
 button#sendButton {

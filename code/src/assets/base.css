@@ -9,6 +9,8 @@
   --green: #92fe00;
   --blue: #192b3e;
   --radius: 20px;
+  --vGap: 1vh;
+  --hGap: 1vw;
 }
 
 *,

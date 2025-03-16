@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import request from '@/stores/requestManager';
+import { clearPhone } from '@/stores/tools';
 import { ref, watch, type PropType } from 'vue';
+import { useRoute } from 'vue-router';
 
 const props = defineProps({
   changeContact: {
@@ -13,6 +15,21 @@ const props = defineProps({
   },
 });
 watch(() => props.receviedEvent, newEvent, { immediate: true });
+
+const route = useRoute();
+const popUpVisible = ref(false);
+const phone = ref((route.query.phone || '') as string);
+
+async function search() {
+  phone.value = clearPhone(phone.value);
+  props.changeContact(phone.value);
+  console.log(phone.value, contacts.value);
+}
+
+async function searchContact(contact: realContact) {
+  phone.value = clearPhone(contact.phoneNumber);
+  props.changeContact(phone.value);
+}
 
 async function newEvent() {
   if (!props.receviedEvent) return;
@@ -73,23 +90,7 @@ async function newEvent() {
   }
 }
 
-const contacts = ref<
-  Map<
-    string,
-    {
-      contactName: string | undefined;
-      phoneNumber: string;
-      message: string;
-      messageID: string;
-      date: Date;
-      senderID: string | undefined;
-      direction: boolean;
-      status: 'received' | 'sent' | 'delivered' | 'failed' | 'pending';
-      deliveredAt: Date | undefined;
-      sendAt: Date | undefined;
-    }
-  >
->(new Map());
+const contacts = ref<Map<string, realContact>>(new Map());
 const errored = ref<string | undefined>();
 
 async function getContact() {
@@ -127,10 +128,35 @@ getContact();
 
 <template>
   <div class="contactListComp">
+    <form @submit.prevent="search">
+      <label for="phone">Numero : </label>
+      <input
+        id="phone"
+        v-model="phone"
+        type="tel"
+        required
+        pattern="[0-9]{10}"
+        placeholder="Entrez un numéro de téléphone"
+      />
+      <button type="submit">Rechercher</button>
+    </form>
+    <!-- if not fond -->
+    <div v-if="popUpVisible">
+      cet utilisateur semble inconnus...
+      <a :href="`/createContact?phone=${phone}`">cliquez ici pour le créer</a>
+    </div>
     <ul>
       <!-- contacts is an map -->
       <li v-for="[contactID, contact] in contacts">
-        <div class="contactEmbed" v-on:click="props.changeContact(contactID)">
+        <div
+          v-on:click="searchContact(contact)"
+          :class="[
+            'contactEmbed',
+            {
+              selected: phone == contact.phoneNumber,
+            },
+          ]"
+        >
           <div class="textPart">
             <div class="conactName">{{ contact.contactName ?? contact.phoneNumber }}</div>
             <div class="lastMessage">{{ contact.message }}</div>
@@ -178,7 +204,9 @@ li {
 .contactEmbed:hover {
   background-color: var(--white);
 }
-
+.contactEmbed.selected {
+  border: 1px solid var(--green);
+}
 .metaPart {
   gap: 1vh;
   color: grey;
@@ -193,5 +221,38 @@ li {
 
 .conactName {
   font-weight: bold;
+}
+
+form {
+  border-radius: var(--radius);
+  background-color: var(--white);
+  padding: var(--vGap);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+input {
+  height: 4vh;
+  border: none;
+  padding: 0px 2%;
+  margin-right: 1%;
+  border-radius: var(--radius);
+  background-color: white;
+  width: 100%;
+}
+
+label {
+  white-space: nowrap;
+  padding: 0 var(--vGap);
+}
+
+button {
+  border: none;
+  background-color: var(--blue);
+  color: white;
+  height: 4vh;
+  border-radius: var(--radius);
+  padding: 0 var(--vGap);
 }
 </style>

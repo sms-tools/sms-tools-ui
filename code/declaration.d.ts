@@ -12,8 +12,21 @@ type Message = {
 
 type contact = {
   createDate: Date;
-  phoneNumber: String;
+  phoneNumber: string;
   contactName: string | undefined;
+};
+
+type realContact = {
+  contactName: string | undefined;
+  phoneNumber: string;
+  message: string;
+  messageID: string;
+  date: Date;
+  senderID: string | undefined;
+  direction: boolean;
+  status: 'received' | 'sent' | 'delivered' | 'failed' | 'pending';
+  deliveredAt: Date | undefined;
+  sendAt: Date | undefined;
 };
 
 type sseEvent = {
@@ -25,7 +38,7 @@ type sseEvent = {
 };
 
 type sendEvent = {
-  userID: mongoose.Schema.ObjectId;
+  userID: string;
   message: string;
   sendAt: Date;
   contactName: string | undefined;

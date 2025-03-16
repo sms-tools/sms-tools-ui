@@ -89,14 +89,18 @@ async function newEvent() {
     else messages.value = [message];
   }
   //for partial event with update
-  else if (props.receviedEvent.event == 'delivered' || props.receviedEvent.event == 'failed') {
+  else if (
+    (props.receviedEvent as unknown as sseEvent | undefined).event == 'delivered' ||
+    (props.receviedEvent as unknown as sseEvent | undefined).event == 'failed'
+  ) {
     if (Array.isArray(messages.value)) {
       //search message
       for (let i = 0; i < messages.value.length; i++) {
         if (messages.value[i].messageID == props.receviedEvent.messageID) {
           //update message
-          messages.value[i].status == props.receviedEvent.event;
-          if (props.receviedEvent.event == 'delivered') {
+          messages.value[i].status ==
+            (props.receviedEvent as unknown as sseEvent | undefined).event;
+          if ((props.receviedEvent as unknown as sseEvent | undefined).event == 'delivered') {
             const delivred = props.receviedEvent as {
               status: deliveredEvent;
             };
@@ -139,10 +143,10 @@ async function loadMessages() {
   try {
     const response = await request('getMessage', 'post', body);
 
-    if (response?.status === 200) {
+    if (response && response?.status === 200) {
       messages.value = response.body.data;
     } else {
-      error.value = `Erreur ${response?.status}`;
+      error.value = `error ${response ? response?.status : 'th response is incorect'}`;
     }
   } catch (err) {
     console.error(err);
