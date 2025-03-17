@@ -13,7 +13,7 @@ const routes = [
   { path: '/ui/contact', name: 'contact', component: ContactPage, meta: { requiresAuth: true } },
   {
     path: '/ui/manySms',
-    name: 'many sms',
+    name: 'manySms',
     component: SendMasseSms,
     meta: { requiresAuth: true },
   },
